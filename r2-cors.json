@@ -1,0 +1,9 @@
+[
+  {
+    "AllowedOrigins": ["https://mexmovies.pages.dev", "http://localhost:5173"],
+    "AllowedMethods": ["GET", "HEAD", "PUT"],
+    "AllowedHeaders": ["*"],
+    "ExposeHeaders": ["ETag"],
+    "MaxAgeSeconds": 3600
+  }
+]
