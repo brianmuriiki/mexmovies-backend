@@ -6,7 +6,7 @@ const activityLogSchema = new mongoose.Schema(
   {
     actor: { type: ObjectId, ref: 'User', required: true, index: true },
     action: { type: String, required: true }, // e.g. movie.create, movie.approve, user.create
-    targetType: { type: String, enum: ['movie', 'user', 'genre'] },
+    targetType: { type: String, enum: ['movie', 'user', 'genre', 'report'] },
     targetId: ObjectId,
     details: Object,
     createdAt: { type: Date, default: Date.now },

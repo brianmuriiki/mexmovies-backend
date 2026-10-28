@@ -8,6 +8,8 @@ import {
   deleteMovie,
 } from '../controllers/manager.controller.js';
 import { signUpload, completeUpload } from '../controllers/upload.controller.js';
+import { signImageUpload, completeImageUpload } from '../controllers/imageUpload.controller.js';
+import { checkVideo } from '../controllers/youtube.controller.js';
 import { authenticate } from '../middleware/auth.js';
 import { requireRole } from '../middleware/requireRole.js';
 import { validate } from '../middleware/validate.js';
@@ -19,6 +21,9 @@ import {
   managerMovieUpdate,
   signUploadSchema,
   completeUploadSchema,
+  imageSignSchema,
+  imageCompleteSchema,
+  videoCheckQuery,
 } from '../validators/schemas.js';
 
 const router = Router();
@@ -30,9 +35,12 @@ router.get('/movies/:id', validate(idParam, 'params'), getMine);
 router.put('/movies/:id', validate(idParam, 'params'), validate(managerMovieUpdate), updateMovie);
 router.patch('/movies/:id/submit', validate(idParam, 'params'), submitMovie);
 router.delete('/movies/:id', validate(idParam, 'params'), deleteMovie);
+router.get('/check-video', validate(videoCheckQuery, 'query'), checkVideo);
 
 // Own-movie uploads: 1) sign, 2) browser uploads straight to storage, 3) complete
 router.post('/uploads/sign', validate(signUploadSchema), signUpload);
 router.post('/uploads/complete', validate(completeUploadSchema), completeUpload);
+router.post('/uploads/image/sign', validate(imageSignSchema), signImageUpload);
+router.post('/uploads/image/complete', validate(imageCompleteSchema), completeImageUpload);
 
 export default router;

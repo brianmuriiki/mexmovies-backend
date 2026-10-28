@@ -5,6 +5,7 @@ import { createGenre, deleteGenre } from '../controllers/genre.controller.js';
 import { deleteUpload, storage } from '../controllers/upload.controller.js';
 import { rebuildCatalog } from '../controllers/catalog.controller.js';
 import * as polls from '../controllers/poll.controller.js';
+import * as reports from '../controllers/report.controller.js';
 import { adminGrant } from '../controllers/subscription.controller.js';
 import { authenticate } from '../middleware/auth.js';
 import { requireRole } from '../middleware/requireRole.js';
@@ -30,6 +31,8 @@ import {
   redemptionItemCreate,
   redemptionItemUpdate,
   adjustPointsSchema,
+  reportListQuery,
+  reportUpdateSchema,
 } from '../validators/schemas.js';
 
 const router = Router();
@@ -57,12 +60,17 @@ router.get('/users', validate(userListQuery, 'query'), admin.listUsers);
 router.post('/users', validate(createManagerSchema), admin.createManager);
 router.patch('/users/:id', validate(idParam, 'params'), validate(updateUserSchema), admin.updateUser);
 
+// Viewer reports
+router.get('/reports', validate(reportListQuery, 'query'), reports.listReports);
+router.patch('/reports/:id', validate(idParam, 'params'), validate(reportUpdateSchema), reports.updateReport);
+
 // Genres
 router.post('/genres', validate(genreSchema), createGenre);
 router.delete('/genres/:id', validate(idParam, 'params'), deleteGenre);
 
 // Rewards and points
 router.get('/rewards/stats', adminRewards.rewardStats);
+router.get('/rewards/catalog', adminRewards.listRedemptionItems);
 router.patch('/rewards/levels', validate(levelsUpdateSchema), adminRewards.updateLevels);
 router.post('/rewards/catalog', validate(redemptionItemCreate), adminRewards.createRedemptionItem);
 router.patch('/rewards/catalog/:id', validate(idParam, 'params'), validate(redemptionItemUpdate), adminRewards.updateRedemptionItem);

@@ -28,3 +28,20 @@ export const authenticate = asyncHandler(async (req, _res, next) => {
   req.user = user;
   next();
 });
+
+export const optionalAuthenticate = asyncHandler(async (req, _res, next) => {
+  const header = req.headers.authorization;
+  const token = req.cookies?.token || (header?.startsWith('Bearer ') ? header.slice(7) : null);
+  if (!token) return next();
+
+  try {
+    const payload = jwt.verify(token, env.jwtSecret);
+    const user = await User.findById(payload.sub);
+    if (user?.isActive) req.user = user;
+  } catch (err) {
+    if (err.name !== 'JsonWebTokenError' && err.name !== 'TokenExpiredError' && err.name !== 'NotBeforeError') {
+      return next(err);
+    }
+  }
+  next();
+});

@@ -31,6 +31,12 @@ export const rewardStats = asyncHandler(async (_req, res) => {
   });
 });
 
+// GET /api/admin/rewards/catalog
+export const listRedemptionItems = asyncHandler(async (_req, res) => {
+  const items = await RedemptionItem.find().sort({ createdAt: -1 }).lean();
+  res.json({ data: items });
+});
+
 // PATCH /api/admin/rewards/levels  { levels: [{ key, hours?, perk?, bonusPoints?, name? }] }
 export const updateLevels = asyncHandler(async (req, res) => {
   await ensureLevelsSeeded();

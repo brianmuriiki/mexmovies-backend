@@ -49,6 +49,37 @@ export const transactionListQuery = z.object({
   userId: objectId.optional(),
 });
 
+export const reportListQuery = z.object({
+  page,
+  limit: z.coerce.number().int().min(1).max(100).default(20),
+  status: z.enum(['open', 'resolved', 'dismissed']).optional(),
+});
+
+export const reportCreateSchema = z.object({
+  reason: z.enum(['broken', 'infringement', 'inappropriate', 'other']),
+  message: z.string().trim().max(1000).optional(),
+  email: z.preprocess((value) => value === '' ? undefined : value, z.string().trim().toLowerCase().email().max(120).optional()),
+  turnstileToken: z.string().max(2048).optional(),
+});
+
+export const reportUpdateSchema = z.object({
+  status: z.enum(['open', 'resolved', 'dismissed']),
+  note: z.string().trim().max(500).optional(),
+});
+
+export const videoCheckQuery = z.object({ url: z.string().trim().url().max(500) });
+
+export const imageSignSchema = z.object({
+  kind: z.enum(['poster', 'backdrop']),
+  fileName: z.string().trim().min(1).max(200),
+  contentType: z.enum(['image/jpeg', 'image/png', 'image/webp']),
+  sizeBytes: z.coerce.number().int().min(1).max(5 * 1024 * 1024),
+});
+
+export const imageCompleteSchema = z.object({
+  key: z.string().regex(/^images\/[a-f\d]{24}\/(?:poster|backdrop)\/[a-f\d]{32}\.(?:jpg|png|webp)$/i, 'Invalid image upload key'),
+});
+
 // ---------- auth ----------
 const turnstileToken = z.string().max(2048).optional(); // from the Cloudflare Turnstile widget
 export const registerSchema = z.object({ name: z.string().trim().min(2).max(80), email, password, turnstileToken });

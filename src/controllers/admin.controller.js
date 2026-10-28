@@ -3,6 +3,7 @@ import User from '../models/User.js';
 import Genre from '../models/Genre.js';
 import Watchlist from '../models/Watchlist.js';
 import ActivityLog from '../models/ActivityLog.js';
+import Report from '../models/Report.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiError } from '../utils/ApiError.js';
 import { pageResult } from '../utils/pagination.js';
@@ -228,11 +229,12 @@ export const listLogs = asyncHandler(async (req, res) => {
 
 // GET /api/admin/stats
 export const stats = asyncHandler(async (_req, res) => {
-  const [movieCounts, userCounts, genres] = await Promise.all([
+  const [movieCounts, userCounts, genres, openReports] = await Promise.all([
     Movie.aggregate([{ $group: { _id: '$status', count: { $sum: 1 } } }]),
     User.aggregate([{ $group: { _id: '$role', count: { $sum: 1 } } }]),
     Genre.countDocuments(),
+    Report.countDocuments({ status: 'open' }),
   ]);
   const toObject = (rows) => Object.fromEntries(rows.map((r) => [r._id, r.count]));
-  res.json({ data: { movies: toObject(movieCounts), users: toObject(userCounts), genres } });
+  res.json({ data: { movies: toObject(movieCounts), users: toObject(userCounts), genres, openReports } });
 });

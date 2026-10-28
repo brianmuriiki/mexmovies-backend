@@ -26,6 +26,22 @@ const sign = (token, body) => request(app).post('/api/manager/uploads/sign').set
 const file = (movieId, sizeBytes = 500_000, extra = {}) => ({ movieId, fileName: 'film.mp4', contentType: 'video/mp4', sizeBytes, ...extra });
 
 describe('own-movie uploads', () => {
+  test('managers can sign an image upload and unsupported image types are rejected', async () => {
+    const signed = await request(app)
+      .post('/api/manager/uploads/image/sign')
+      .set(bearer(w.manager))
+      .send({ kind: 'poster', fileName: 'poster.webp', contentType: 'image/webp', sizeBytes: 120_000 });
+    expect(signed.status).toBe(200);
+    expect(signed.body.data.key).toMatch(/^images\/[a-f\d]{24}\/poster\/[a-f\d]{32}\.webp$/i);
+    expect(signed.body.data.publicUrl).toContain(signed.body.data.key);
+
+    const unsupported = await request(app)
+      .post('/api/manager/uploads/image/sign')
+      .set(bearer(w.manager))
+      .send({ kind: 'poster', fileName: 'poster.gif', contentType: 'image/gif', sizeBytes: 120_000 });
+    expect(unsupported.status).toBe(400);
+  });
+
   test('a draft with an uploaded-file source can be saved without a link', async () => {
     const id = await createR2Draft(w.manager);
     expect(id).toBeTruthy();

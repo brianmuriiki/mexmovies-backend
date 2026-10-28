@@ -18,6 +18,7 @@ export const apiLimiter = make(15 * 60 * 1000, 600, 'Too many requests. Please s
 export const loginLimiter = make(15 * 60 * 1000, 10, 'Too many login attempts. Try again in 15 minutes.');
 export const registerLimiter = make(HOUR, 10, 'Too many sign-ups from this network. Try again later.');
 export const viewLimiter = make(60 * 1000, 30, 'Too many requests.');
+export const reportLimiter = make(60 * 60 * 1000, 10, 'Too many reports. Please try again later.');
 export const emailLimiter = make(HOUR, 5, 'Too many email requests. Try again later.');
 export const resetLimiter = make(HOUR, 10, 'Too many attempts. Try again later.');
 // Per logged-in user (must run after authenticate)

@@ -80,6 +80,20 @@ describe('watch-time credits', () => {
 });
 
 describe('rewards API', () => {
+  test('admins can list active and hidden redemption catalog items', async () => {
+    await RedemptionItem.create([
+      { name: 'Visible month', costPoints: 100, active: true },
+      { name: 'Hidden month', costPoints: 200, active: false },
+    ]);
+    const admin = await createUser({ role: 'admin', email: 'admin@test.com' });
+    const token = await loginAs(app, admin.email);
+
+    const response = await request(app).get('/api/admin/rewards/catalog').set(bearer(token));
+    expect(response.status).toBe(200);
+    expect(response.body.data).toHaveLength(2);
+    expect(response.body.data.map((item) => item.active).sort()).toEqual([false, true]);
+  });
+
   test('heartbeat requires login and validates input', async () => {
     const body = { movieId: '64b000000000000000000001', sessionId: 'session-abcdef', seconds: 60 };
     expect((await request(app).post('/api/watch/heartbeat').send(body)).status).toBe(401);
