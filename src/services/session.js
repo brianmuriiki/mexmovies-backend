@@ -8,8 +8,7 @@ export function startSession(res, user, status = 200) {
     expiresIn: env.jwtExpiresIn,
   });
   res.cookie('token', token, { ...baseOptions(), maxAge: env.cookieMaxAgeMs });
-  // The token is only included in the body outside production, to make API testing easy.
-  res.status(status).json({ data: user, ...(isProd ? {} : { token }) });
+  res.status(status).json({ data: user, token });
 }
 
 export function clearSession(res) {
